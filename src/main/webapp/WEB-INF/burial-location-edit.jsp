@@ -231,25 +231,22 @@
         <div class="form-grid">
 
             <div class="form-field full-width">
-                <label for="personId">Человек</label>
+                <label for="personIds">Люди, связанные с местом захоронения</label>
 
-                <select id="personId" name="personId" required>
-                    <option value="">Выберите человека</option>
+                <small class="hint">Выбранных людей поменять нельзя.</small>
+                <select id="personIds" name="personIds" multiple required size="6" <c:if test="${not empty id}">disabled</c:if>>
 
                     <c:forEach var="person" items="${persons}">
                         <option value="${person.id()}"
-                                <c:if test="${location.personId() eq person.id()}">
+                                <c:if test="${location.personIds().contains(person.id())}">
                                     selected
                                 </c:if>>
-                            <c:out value="${person.firstName()}"/>
                             <c:out value="${person.lastName()}"/>
+                            <c:out value="${person.firstName()}"/>
                         </option>
                     </c:forEach>
-                </select>
 
-                <p class="hint">
-                    Выберите человека, с которым связано место захоронения.
-                </p>
+                </select>
             </div>
 
             <div class="form-field">
@@ -284,10 +281,6 @@
                     </c:if>>
                     Координаты точные
                 </label>
-
-                <p class="hint">
-                    Если координаты приблизительные, оставьте флажок снятым.
-                </p>
             </div>
 
             <div class="form-field full-width">

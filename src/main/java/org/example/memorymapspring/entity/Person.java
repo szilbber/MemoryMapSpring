@@ -33,9 +33,8 @@ public class Person {
     @Column(name = "description")
     private String description;
 
-    @OneToOne(mappedBy = "person",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "burial_location_id")
     private BurialLocation burialLocation;
 
 }

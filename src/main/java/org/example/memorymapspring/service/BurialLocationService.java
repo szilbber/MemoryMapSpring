@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -36,31 +38,30 @@ public class BurialLocationService {
     public void create(BurialLocationDto dto) {
         BurialLocation location = new BurialLocation();
         dto.applyTo(location);
-        location.setPerson(getPerson(dto.personId()));
         locationRepository.save(location);
+        Set<Person> persons = getPersons(dto.personIds());
+        for (Person person : persons) {
+            person.setBurialLocation(location);
+        }
+        location.setPersons(persons);
+        personRepository.saveAll(persons);
     }
 
     @Transactional
     public void update(Long id, BurialLocationDto dto) {
         BurialLocation location = getEntity(id);
         dto.applyTo(location);
-        location.setPerson(getPerson(dto.personId()));
         locationRepository.save(location);
     }
 
     @Transactional
     public void delete(Long id) {
-        locationRepository.delete(getEntity(id));
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsForPerson(Long personId) {
-        return locationRepository.existsByPersonId(personId);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsForPersonExceptLocation(Long personId, Long locationId) {
-        return locationRepository.existsByPersonIdAndIdNot(personId, locationId);
+        BurialLocation location = getEntity(id);
+        for (Person person : location.getPersons()) {
+            person.setBurialLocation(null);
+        }
+        personRepository.saveAll(location.getPersons());
+        locationRepository.delete(location);
     }
 
     private BurialLocation getEntity(Long id) {
@@ -69,9 +70,17 @@ public class BurialLocationService {
                         HttpStatus.NOT_FOUND, "Место захоронения не найдено"));
     }
 
-    private Person getPerson(Long personId) {
-        return personRepository.findById(personId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Человек не найден"));
+    private Set<Person> getPersons(List<Long> personIds) {
+        if (personIds == null || personIds.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Выберите хотя бы одного человека");
+        }
+        Set<Long> ids = new HashSet<>(personIds);
+        List<Person> persons = personRepository.findAllById(ids);
+        if (persons.size() != ids.size()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Один или несколько человек не найдены");
+        }
+        return new HashSet<>(persons);
     }
 }

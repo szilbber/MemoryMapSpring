@@ -8,10 +8,11 @@ import java.util.List;
 
 public interface BurialLocationRepository extends JpaRepository<BurialLocation, Long> {
 
-    boolean existsByPersonId(Long personId);
-
-    boolean existsByPersonIdAndIdNot(Long personId, Long id);
-
-    @Query("SELECT b FROM BurialLocation b JOIN FETCH b.person ORDER BY b.id")
+    @Query("""
+    SELECT DISTINCT b
+    FROM BurialLocation b
+    LEFT JOIN FETCH b.persons
+    ORDER BY b.id
+    """)
     List<BurialLocation> findAllWithPerson();
 }

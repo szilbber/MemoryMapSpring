@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -28,7 +31,6 @@ public class BurialLocation {
     @Column(name = "description")
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "person_id", nullable = false, unique = true)
-    private Person person;
+    @OneToMany(mappedBy = "burialLocation", fetch = FetchType.LAZY)
+    private Set<Person> persons = new HashSet<>();
 }

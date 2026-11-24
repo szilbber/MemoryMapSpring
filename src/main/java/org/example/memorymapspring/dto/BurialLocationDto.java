@@ -4,6 +4,9 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import org.example.memorymapspring.entity.BurialLocation;
+import org.example.memorymapspring.entity.Person;
+
+import java.util.List;
 
 public record BurialLocationDto(
         Long id,
@@ -20,10 +23,9 @@ public record BurialLocationDto(
 
         String description,
 
-        @NotNull(message = "Выберите человека")
-        Long personId,
+        List<Long> personIds,
 
-        String personName
+        List<String> personNames
 ) {
 
     public BurialLocationDto {
@@ -31,7 +33,7 @@ public record BurialLocationDto(
     }
 
     public static BurialLocationDto empty() {
-        return new BurialLocationDto(null, null, null, false, null, null, null);
+        return new BurialLocationDto(null, null, null, false, null, List.of(), List.of());
     }
 
     public static BurialLocationDto from(BurialLocation location) {
@@ -41,9 +43,12 @@ public record BurialLocationDto(
                 location.getLongitude(),
                 location.isExact(),
                 location.getDescription(),
-                location.getPerson().getId(),
-                location.getPerson().getLastName() + " "
-                        + location.getPerson().getFirstName()
+                location.getPersons().stream()
+                        .map(Person::getId)
+                        .toList(),
+                location.getPersons().stream()
+                        .map(person -> person.getLastName() + " " + person.getFirstName())
+                        .toList()
         );
     }
 

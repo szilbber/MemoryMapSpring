@@ -24,6 +24,11 @@ public class PersonService {
     }
 
     @Transactional(readOnly = true)
+    public List<Person> findAllWithoutBurialLocation() {
+        return personRepository.findByBurialLocationIsNull();
+    }
+
+    @Transactional(readOnly = true)
     public PersonDto findById(Long id) {
         return PersonDto.from(getEntity(id));
     }

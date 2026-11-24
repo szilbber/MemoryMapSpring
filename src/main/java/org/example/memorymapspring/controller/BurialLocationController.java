@@ -25,7 +25,7 @@ public class BurialLocationController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("locations", burialLocationService.findAll());
-        model.addAttribute("persons", personService.findAll());   // вот эта
+        model.addAttribute("persons", personService.findAllWithoutBurialLocation());
         return "burial-locations";
     }
 
@@ -49,12 +49,6 @@ public class BurialLocationController {
                          BindingResult result,
                          Model model) {
 
-        if (!result.hasFieldErrors("personId")
-                && burialLocationService.existsForPerson(location.personId())) {
-            result.rejectValue("personId", "duplicate",
-                    "У этого человека уже есть место захоронения. Выберите другого человека.");
-        }
-
         if (result.hasErrors()) {
             model.addAttribute("persons", personService.findAll());
             return "burial-location-edit";
@@ -69,13 +63,6 @@ public class BurialLocationController {
                          @Valid @ModelAttribute("location") BurialLocationDto location,
                          BindingResult result,
                          Model model) {
-
-        if (!result.hasFieldErrors("personId")
-                && burialLocationService.existsForPersonExceptLocation(
-                location.personId(), id)) {
-            result.rejectValue("personId", "duplicate",
-                    "У выбранного человека уже есть другое место захоронения. Выберите другого человека.");
-        }
 
         if (result.hasErrors()) {
             model.addAttribute("id", id);

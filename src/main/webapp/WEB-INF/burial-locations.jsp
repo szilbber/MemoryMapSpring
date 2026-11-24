@@ -23,6 +23,12 @@
         a { color: #245b8f; text-decoration: none; }
         a:hover { text-decoration: underline; }
 
+        .hint {
+            color: #777;
+            font-size: 13px;
+            margin: 0;
+        }
+
         .navigation {
             display: flex;
             gap: 20px;
@@ -157,13 +163,15 @@
     <form action="${pageContext.request.contextPath}/burial-locations" method="post">
         <div class="form-grid">
             <div class="form-field full-width">
-                <label for="personId">Человек</label>
-                <select id="personId" name="personId" required>
-                    <option value="">Выберите человека</option>
+                <label for="personIds">Люди, связанные с местом захоронения</label>
+
+                <small class="hint">Чтобы выбрать нескольких людей, удерживайте Ctrl при выборе.</small>
+                <small class="hint">Выбрать можно только тех людей, у которых еще нет места.</small>
+                <select id="personIds" name="personIds" multiple required size="6">
                     <c:forEach var="person" items="${persons}">
-                        <option value="${person.id()}">
-                            <c:out value="${person.firstName()}"/>
-                            <c:out value="${person.lastName()}"/>
+                        <option value="${person.id}">
+                            <c:out value="${person.lastName}"/>
+                            <c:out value="${person.firstName}"/>
                         </option>
                     </c:forEach>
                 </select>
@@ -205,7 +213,7 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Человек</th>
+            <th>Люди</th>
             <th>Широта</th>
             <th>Долгота</th>
             <th>Точность координат</th>
@@ -218,7 +226,10 @@
             <tr>
                 <td><c:out value="${location.id()}"/></td>
                 <td>
-                    <c:out value="${location.personName()}"/>
+                    <c:forEach items="${location.personNames()}" var="personName" varStatus="status">
+                        <c:if test="${status.index > 0}">, </c:if>
+                        <c:out value="${personName}"/>
+                    </c:forEach>
                 </td>
                 <td><c:out value="${location.latitude()}"/></td>
                 <td><c:out value="${location.longitude()}"/></td>
