@@ -1,17 +1,16 @@
 -- Таблица мест захоронения
 CREATE TABLE burial_locations (
-                                  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                                  latitude DOUBLE PRECISION,
-                                  longitude DOUBLE PRECISION,
-                                  is_exact BOOLEAN NOT NULL DEFAULT FALSE,
-                                  description TEXT,
-                                  person_id BIGINT NOT NULL UNIQUE,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    is_exact BOOLEAN NOT NULL DEFAULT FALSE,
+    description TEXT
 
-                                  CONSTRAINT chk_latitude
-                                      CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
+    CONSTRAINT chk_latitude
+        CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
 
-                                  CONSTRAINT chk_longitude
-                                      CHECK (longitude IS NULL OR longitude BETWEEN -180 AND 180)
+    CONSTRAINT chk_longitude
+        CHECK (longitude IS NULL OR longitude BETWEEN -180 AND 180)
 );
 
 -- Таблица персон
@@ -43,6 +42,8 @@ VALUES
     ('Иван', 'Иванов', '1940-03-15', '2010-08-21',
      'Пример записи для проверки приложения', 1),
     ('Мария', 'Петрова', '1952-11-02', '2020-05-14',
-     'Место захоронения известно приблизительно', 1),
+     'Место захоронения известно', 1),
+    ('Алина', 'Метрова', '1952-11-02', '2020-05-14',
+     'Место захоронения известно приблизительно', 2),
     ('Алексей', 'Сидоров', '1935-06-10', '2001-12-30',
      'Тестовая запись без указанного места захоронения', null);
